@@ -1,4 +1,5 @@
-override CFLAGS+= -std=c99 -D_GNU_SOURCE -DDEGUG -g -Wall
+override CFLAGS+= -std=c99 -D_GNU_SOURCE -DDEBUG -g -Wall
+#-fsanitize=address
 
 .PHONY: clean test
 

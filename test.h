@@ -3,10 +3,6 @@
 
 #include <stdint.h>
 
-#ifndef TEST_DB_CONNSTR
-#define TEST_DB_CONNSTR "user=kuben_user dbname=kuben_importing_test host=localhost"
-#endif
-
 typedef struct test_context_s {
   uint16_t test_passed;
   uint16_t test_failed;
@@ -18,8 +14,6 @@ void test_ctx (int (*func)(test_context_t *), const char *name, test_context_t *
 
 void test_context_init(test_context_t * context);
 void test_context_show_result(test_context_t * context);
-
-int read_json_file(char ** buf, char * filename);
 
 #define fail()  return __LINE__
 
