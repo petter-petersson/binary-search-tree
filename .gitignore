@@ -1,0 +1,5 @@
+*.swp
+*.swo
+*.o
+binary_search_tree_test
+
