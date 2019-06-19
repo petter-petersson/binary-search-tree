@@ -1,12 +1,6 @@
 #ifndef BINARY_SEARCH_TREE_H
 #define BINARY_SEARCH_TREE_H
 
-#ifdef DEBUG
-#define BST_LOG(f_, ...) printf((f_), __VA_ARGS__)
-#else
-#define BST_LOG(f_, ...)
-#endif
-
 #define BST_MAX(a,b) (((a)>(b))?(a):(b))
 
 //accessor macros
@@ -50,13 +44,18 @@ bst_t * bst_init();
 void bst_add(bst_t * tree, int key, void * value);
 void bst_insert(bst_node_t ** node, int key, void * value);
 void bst_traverse(bst_node_t * node, traverse_func func, void * arg);
+void bst_delete(bst_t * tree, int key);
 void bst_free(bst_t * tree);
-void bst_node_free(bst_node_t * node);
+bst_node_t * bst_find(bst_node_t * node, int key);
 
+/* private */
+void bst_node_free(bst_node_t * node);
 bst_node_t * bst_rotate_left(bst_node_t * node);
 bst_node_t * bst_rotate_right(bst_node_t * node);
 bst_node_t * bst_rotate_leftright(bst_node_t * node);
 bst_node_t * bst_rotate_rightleft(bst_node_t * node);
-
 int bst_balance(bst_node_t * node);
+void bst_node_delete(bst_t * tree, bst_node_t * current_root, bst_node_t * node, int key);
+bst_node_t * bst_find_parent(bst_node_t * parent, bst_node_t * node, int key);
+bst_node_t * bst_find_min(bst_node_t * node);
 #endif

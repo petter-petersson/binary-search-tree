@@ -8,6 +8,268 @@
 #include "test.h"
 #include "binary_search_tree.h"
 
+typedef struct print_many_args_s {
+  int count;
+  int max_height;
+  int min_key;
+  int max_key;
+} print_many_args_t;
+
+extern void init_print_many_args_t(print_many_args_t * args) {
+  args->max_height = 0;
+  args->min_key = INT_MAX;
+  args->max_key = 0;
+  args->count = 0;
+}
+
+extern void print_node_for_many(bst_node_t * node, void * arg){
+  print_many_args_t * args = (print_many_args_t *) arg;
+
+  if(node->height > args->max_height){
+    args->max_height = node->height;
+  }
+  if(node->key < args->min_key){
+    args->min_key = node->key;
+  }
+  if(node->key > args->max_key){
+    args->max_key = node->key;
+  }
+  (args->count)++;
+}
+
+extern void print_node_for_delete(bst_node_t * node, void * arg){
+  printf("key: %d value: %s height: %d\n", 
+      node->key, 
+      (char *) node->value,
+      node->height);
+}
+
+int test_bst_delete_node_with_both_branches(test_context_t * ctx) {
+  bst_t * tree = bst_init();
+  check(tree != NULL, ctx);
+
+  bst_add(tree, 2, NULL);
+  bst_add(tree, 1, NULL);
+  bst_add(tree, 3, NULL);
+
+  check(key_bst_node_t(tree->root) == 2, ctx);
+  check(height_bst_node_t(tree->root) == 1, ctx);
+
+  bst_delete(tree, 2);
+
+  check(key_bst_node_t(tree->root) == 3, ctx);
+  check(height_bst_node_t(tree->root) == 1, ctx);
+
+  if(tree != NULL){
+    bst_free(tree);
+  }
+
+  return 0;
+}
+
+int test_bst_delete_node_with_left_branch(test_context_t * ctx) {
+  bst_t * tree = bst_init();
+  check(tree != NULL, ctx);
+
+  bst_add(tree, 3, NULL);
+  bst_add(tree, 2, NULL);
+  bst_add(tree, 1, NULL);
+
+  check(key_bst_node_t(tree->root) == 3, ctx);
+  check(height_bst_node_t(tree->root) == 2, ctx);
+
+  bst_delete(tree, 2);
+
+  check(key_bst_node_t(tree->root) == 3, ctx);
+  check(key_bst_node_t(left_bst_node_t(tree->root)) == 1, ctx);
+  check(left_bst_node_t(left_bst_node_t(tree->root)) == NULL, ctx);
+  
+  check(height_bst_node_t(tree->root) == 1, ctx);
+
+  if(tree != NULL){
+    bst_free(tree);
+  }
+
+  return 0;
+}
+
+int test_bst_delete_node_with_right_branch(test_context_t * ctx) {
+  bst_t * tree = bst_init();
+  check(tree != NULL, ctx);
+
+  bst_add(tree, 1, NULL);
+  bst_add(tree, 2, NULL);
+  bst_add(tree, 3, NULL);
+
+  check(key_bst_node_t(tree->root) == 1, ctx);
+  check(height_bst_node_t(tree->root) == 2, ctx);
+
+  bst_delete(tree, 2);
+
+  check(key_bst_node_t(tree->root) == 1, ctx);
+  check(key_bst_node_t(right_bst_node_t(tree->root)) == 3, ctx);
+  check(height_bst_node_t(tree->root) == 1, ctx);
+
+  if(tree != NULL){
+    bst_free(tree);
+  }
+
+  return 0;
+}
+int test_bst_delete(test_context_t * ctx) {
+  print_many_args_t test_args;
+
+  bst_t * tree = bst_init();
+  check(tree != NULL, ctx);
+
+  for(int i = 0; i < 500; i++) {
+    bst_add(tree, i, NULL);
+  }
+
+  bst_delete(tree, 498);
+  bst_delete(tree, 15);
+  bst_delete(tree, 143);
+  bst_delete(tree, 432);
+  bst_delete(tree, 20);
+  bst_delete(tree, 77);
+  bst_delete(tree, 490);
+  //should support calling on removed items
+  bst_delete(tree, 490);
+  bst_delete(tree, 490);
+  bst_delete(tree, 490);
+  //should support calling non-existent
+  bst_delete(tree, 123456);
+  
+  init_print_many_args_t(&test_args);
+  bst_traverse(tree->root, print_node_for_many, &test_args);
+  printf("count: %d\n", test_args.count);
+  check(test_args.count == 493, ctx);
+
+  if(tree != NULL){
+    bst_free(tree);
+  }
+
+  return 0;
+}
+int test_bst_delete_many_reverse(test_context_t * ctx) {
+  print_many_args_t test_args;
+
+  bst_t * tree = bst_init();
+  check(tree != NULL, ctx);
+
+  for(int i = 0; i < 500; i++) {
+    bst_add(tree, i, NULL);
+  }
+
+  
+  for(int i = 499; i >= 0; i--) {
+    bst_delete(tree, i);
+  }
+  
+  init_print_many_args_t(&test_args);
+  bst_traverse(tree->root, print_node_for_many, &test_args);
+  printf("count: %d\n", test_args.count);
+  check(test_args.count == 0, ctx);
+
+  if(tree != NULL){
+    bst_free(tree);
+  }
+
+  return 0;
+}
+
+int test_bst_delete_root(test_context_t * ctx) {
+  print_many_args_t test_args;
+
+  bst_t * tree = bst_init();
+  check(tree != NULL, ctx);
+
+  for(int i = 0; i < 500; i++) {
+    bst_add(tree, i, NULL);
+  }
+
+  int root_key = key_bst_node_t(tree->root);
+
+  bst_delete(tree, root_key);
+
+  init_print_many_args_t(&test_args);
+  bst_traverse(tree->root, print_node_for_many, &test_args);
+  printf("count: %d\n", test_args.count);
+  check(test_args.count == 499, ctx);
+
+  if(tree != NULL){
+    bst_free(tree);
+  }
+
+  return 0;
+}
+
+int test_bst_delete_many_in_order(test_context_t * ctx) {
+  print_many_args_t test_args;
+
+  bst_t * tree = bst_init();
+  check(tree != NULL, ctx);
+
+  for(int i = 0; i < 500; i++) {
+    bst_add(tree, i, NULL);
+  }
+  
+  for(int i = 0; i < 500; i++) {
+    bst_delete(tree, i);
+  }
+
+  init_print_many_args_t(&test_args);
+  bst_traverse(tree->root, print_node_for_many, &test_args);
+  printf("count: %d\n", test_args.count);
+  check(test_args.count == 0, ctx);
+
+  if(tree != NULL){
+    bst_free(tree);
+  }
+
+  return 0;
+}
+
+//TODO: delete random order + reverse order
+int test_bst_delete_assert_height(test_context_t * ctx) {
+  print_many_args_t test_args;
+  bst_t * tree = bst_init();
+  check(tree != NULL, ctx);
+
+  for(int i = 0; i < 20; i++) {
+    bst_add(tree, i, NULL);
+  }
+
+  init_print_many_args_t(&test_args);
+  bst_traverse(tree->root, print_node_for_many, &test_args);
+  printf("max height: %d\n", test_args.max_height);
+  check(test_args.max_height == 5, ctx);
+
+  for(int i = 20; i < 500; i++) {
+    bst_add(tree, i, NULL);
+  }
+  init_print_many_args_t(&test_args);
+  bst_traverse(tree->root, print_node_for_many, &test_args);
+  printf("max height: %d\n", test_args.max_height);
+  check(test_args.max_height == 9, ctx);
+
+  for(int i = 0; i < 480; i++) {
+    bst_delete(tree, i);
+  }
+
+  init_print_many_args_t(&test_args);
+  bst_traverse(tree->root, print_node_for_many, &test_args);
+  printf("max height: %d\n", test_args.max_height);
+  check(test_args.max_height == 5, ctx);
+  check(test_args.count == 20, ctx);
+
+  if(tree != NULL){
+    bst_free(tree);
+  }
+
+  return 0;
+}
+
 int test_rotate_rightleft(test_context_t * ctx){
 
   bst_node_t mnodes[] = {
@@ -183,6 +445,7 @@ typedef struct print_node_args_s {
   int count;
   int expected_keys[9];
 } print_node_args_t;
+
 extern void print_node(bst_node_t * node, void * arg){
 
   print_node_args_t * args = (print_node_args_t *) arg;
@@ -293,34 +556,6 @@ int test_add_to_tree_reversed(test_context_t * ctx){
   return 0;
 }
 
-typedef struct print_many_args_s {
-  int count;
-  int max_height;
-  int min_key;
-  int max_key;
-} print_many_args_t;
-
-extern void init_print_many_args_t(print_many_args_t * args) {
-  args->max_height = 0;
-  args->min_key = INT_MAX;
-  args->max_key = 0;
-  args->count = 0;
-}
-
-extern void print_node_for_many(bst_node_t * node, void * arg){
-  print_many_args_t * args = (print_many_args_t *) arg;
-
-  if(node->height > args->max_height){
-    args->max_height = node->height;
-  }
-  if(node->key < args->min_key){
-    args->min_key = node->key;
-  }
-  if(node->key > args->max_key){
-    args->max_key = node->key;
-  }
-  (args->count)++;
-}
 int test_add_many_to_tree(test_context_t * ctx){
 
   print_many_args_t test_args;
@@ -380,8 +615,11 @@ int test_add_many_random_to_tree(test_context_t * ctx){
   srand(time(NULL));
   int r;
 
+  int trackback[1000000];
+
   for(int i=0; i < 1000000; i++) {
     r = rand();// % 10000;
+    trackback[i] = r;
     bst_add(tree, r, NULL);
   }
   printf("done adding\n");
@@ -393,10 +631,19 @@ int test_add_many_random_to_tree(test_context_t * ctx){
 
   //usually the result is 23 but 24 has happened
   check(test_args.max_height <= 25, ctx);
-  //NOTE: this would fail if rand produces a value more than once (which it seems not to
-  //if we don't loop +INT_MAX times)
   printf("count: %d\n", test_args.count);
   check(test_args.count == 1000000, ctx);
+  
+  for(int i=0; i < 1000000; i++) {
+    r = trackback[i];
+    bst_delete(tree, r);
+  }
+  
+  init_print_many_args_t(&test_args);
+  bst_traverse(tree->root, print_node_for_many, &test_args);
+  printf("count: %d\n", test_args.count);
+  check(test_args.count == 0, ctx);
+
   if(tree != NULL){
     bst_free(tree);
   }
@@ -416,5 +663,15 @@ int main(){
   test_ctx(test_add_many_to_tree, "test_add_many_to_tree", &context);
   test_ctx(test_add_many_to_tree_reversed, "test_add_many_to_tree_reversed", &context);
   test_ctx(test_add_many_random_to_tree, "test_add_many_random_to_tree", &context);
+  
+  test_ctx(test_bst_delete_root, "test_bst_delete_root", &context);
+  test_ctx(test_bst_delete, "test_bst_delete", &context);
+  test_ctx(test_bst_delete_many_reverse, "test_bst_delete_many_reverse", &context);
+  test_ctx(test_bst_delete_many_in_order, "test_bst_delete_many_in_order", &context);
+  test_ctx(test_bst_delete_node_with_both_branches, "test_bst_delete_node_with_both_branches", &context);
+  test_ctx(test_bst_delete_node_with_left_branch, "test_bst_delete_node_with_left_branch", &context);
+  test_ctx(test_bst_delete_node_with_right_branch, "test_bst_delete_node_with_right_branch", &context);
+  test_ctx(test_bst_delete_assert_height, "test_bst_delete_assert_height", &context);
+
   test_context_show_result(&context);
 }
