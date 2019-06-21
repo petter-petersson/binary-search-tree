@@ -3,6 +3,14 @@
 
 #define BST_MAX(a,b) (((a)>(b))?(a):(b))
 
+#ifdef VERBOSE
+#define xfree(_n) \
+  (fprintf(stderr, "%s:%d free()\n", __FILE__, __LINE__), \
+   assert((_n) != 0), free(_n))
+#else
+#define xfree(_n) free(_n)
+#endif
+
 //accessor macros
 #ifdef DEBUG
 #define deref_bst_node_t(_n) (assert((_n)!=0), (_n))

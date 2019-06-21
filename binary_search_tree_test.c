@@ -83,7 +83,7 @@ int test_bst_delete_node_with_left_branch(test_context_t * ctx) {
   check(key_bst_node_t(tree->root) == 3, ctx);
   check(key_bst_node_t(left_bst_node_t(tree->root)) == 1, ctx);
   check(left_bst_node_t(left_bst_node_t(tree->root)) == NULL, ctx);
-  
+
   check(height_bst_node_t(tree->root) == 1, ctx);
 
   if(tree != NULL){
@@ -160,12 +160,11 @@ int test_bst_delete_many_reverse(test_context_t * ctx) {
   for(int i = 0; i < 500; i++) {
     bst_add(tree, i, NULL);
   }
-
   
   for(int i = 499; i >= 0; i--) {
     bst_delete(tree, i);
   }
-  
+
   init_print_many_args_t(&test_args);
   bst_traverse(tree->root, print_node_for_many, &test_args);
   printf("count: %d\n", test_args.count);
@@ -213,7 +212,7 @@ int test_bst_delete_many_in_order(test_context_t * ctx) {
   for(int i = 0; i < 500; i++) {
     bst_add(tree, i, NULL);
   }
-  
+
   for(int i = 0; i < 500; i++) {
     bst_delete(tree, i);
   }
@@ -493,7 +492,7 @@ int test_add_to_tree(test_context_t * ctx){
   }
 
   bst_traverse(tree->root, print_node, &test_args);
-  
+
   check(test_args.expected_keys[0] == 1, ctx);
   check(test_args.expected_keys[1] == 5, ctx);
   check(test_args.expected_keys[2] == 10, ctx);
@@ -507,7 +506,7 @@ int test_add_to_tree(test_context_t * ctx){
   check(tree->root->right->left->key == 37, ctx);
   check(tree->root->right->right->key == 57, ctx);
   check(tree->root->right->right->right->key == 67, ctx);
-  //
+
   check(tree->root->left->key == 10, ctx);
   check(tree->root->left->left->key == 1, ctx);
   check(tree->root->left->right->key == 17, ctx);
@@ -633,7 +632,7 @@ int test_add_many_random_to_tree(test_context_t * ctx){
   check(test_args.max_height <= 25, ctx);
   printf("count: %d\n", test_args.count);
   check(test_args.count == 1000000, ctx);
-  
+
   for(int i=0; i < 1000000; i++) {
     r = trackback[i];
     bst_delete(tree, r);
@@ -662,8 +661,9 @@ int main(){
 
   test_ctx(test_add_many_to_tree, "test_add_many_to_tree", &context);
   test_ctx(test_add_many_to_tree_reversed, "test_add_many_to_tree_reversed", &context);
+
   test_ctx(test_add_many_random_to_tree, "test_add_many_random_to_tree", &context);
-  
+
   test_ctx(test_bst_delete_root, "test_bst_delete_root", &context);
   test_ctx(test_bst_delete, "test_bst_delete", &context);
   test_ctx(test_bst_delete_many_reverse, "test_bst_delete_many_reverse", &context);

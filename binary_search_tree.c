@@ -8,7 +8,8 @@
 bst_t * bst_init() {
   bst_t * tree = malloc(sizeof(bst_t));
   if (tree == NULL) {
-    fprintf(stderr, "warn: failed to allocate memory for bst_t\n");
+    fprintf(stderr, "%s:%d failed to allocate memory for bst_t\n", __FILE__, __LINE__);
+    abort();
   }
   tree->root = NULL;
   return tree;
@@ -40,6 +41,7 @@ bst_node_t * bst_find_parent(bst_node_t * parent, bst_node_t * node, int key){
   if(key == key_bst_node_t(node)){
     return parent;
   }
+  fprintf(stderr, "%s:%d unexpected end of function\n", __FILE__, __LINE__);
   abort();
 }
 
@@ -93,17 +95,17 @@ void bst_node_delete(bst_t * tree, bst_node_t * current_root, bst_node_t * node,
     if(parent == node) {
       assert(tree->root == node);
       tree->root = left_bst_node_t(node);
-      free(node);
-      BST_SET_HEIGHT(parent);
+      xfree(node);
+      BST_SET_HEIGHT(tree->root);
     } else {
 
       if(parent && left_bst_node_t(parent) == node) {
         x_left_bst_node_t(parent) = left_bst_node_t(node);
-        free(node);
+        xfree(node);
         BST_SET_HEIGHT(parent);
       } else if (parent && right_bst_node_t(parent) == node) {
         x_right_bst_node_t(parent) = left_bst_node_t(node);
-        free(node);
+        xfree(node);
         BST_SET_HEIGHT(parent);
       }
     }
@@ -114,17 +116,17 @@ void bst_node_delete(bst_t * tree, bst_node_t * current_root, bst_node_t * node,
     if(parent == node) {
       assert(tree->root == node);
       tree->root = right_bst_node_t(node);
-      free(node);
+      xfree(node);
       BST_SET_HEIGHT(tree->root);
 
     } else {
       if (parent && left_bst_node_t(parent) == node) {
         x_left_bst_node_t(parent) = right_bst_node_t(node);
-        free(node);
+        xfree(node);
         BST_SET_HEIGHT(parent);
       } else if (parent && right_bst_node_t(parent) == node) {
         x_right_bst_node_t(parent) = right_bst_node_t(node);
-        free(node);
+        xfree(node);
         BST_SET_HEIGHT(parent);
       }
     }
@@ -133,7 +135,7 @@ void bst_node_delete(bst_t * tree, bst_node_t * current_root, bst_node_t * node,
     if (parent) {
       if (parent == node) {
         assert(tree->root == node);
-        free(node);
+        xfree(node);
         tree->root = NULL;
       } else {
         if(left_bst_node_t(parent) == node) {
@@ -141,7 +143,7 @@ void bst_node_delete(bst_t * tree, bst_node_t * current_root, bst_node_t * node,
         } else if (right_bst_node_t(parent) == node) {
           x_right_bst_node_t(parent) = NULL; 
         }
-        free(node);
+        xfree(node);
         BST_SET_HEIGHT(parent);
       }
     }
