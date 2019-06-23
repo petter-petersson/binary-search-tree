@@ -36,27 +36,3 @@ void test_context_show_result(test_context_t * context){
   printf("failed tests: %d\n", context->test_failed);
   printf("checks run:   %d\n", context->checks_run);
 }
-
-int read_json_file(char ** buf, char * filename){
-  struct stat st; 
-
-  if (stat(filename, &st) != 0) {
-    return 1;
-  }
-
-  *buf = malloc(sizeof(char) * (st.st_size + 1));
-
-  if(*buf == NULL){
-    printf("failed to malloc buf\n");
-    return 2;
-  }
-  FILE *fp = fopen(filename, "rb");
-
-  fread((*buf), 1, st.st_size, fp);
-  (*buf)[st.st_size]='\0';
-
-  fclose(fp);
-
-  return 0;
-}
-
